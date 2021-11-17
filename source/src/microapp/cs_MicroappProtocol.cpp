@@ -31,6 +31,59 @@
 #include <util/cs_Utils.h>
 #include <microapp/cs_MicroappStorage.h>
 
+void handlePresenceCommand(presence_cmd_t* presence_cmd){
+
+	CommandMicroappPresenceOpcode opcode = (CommandMicroappPresenceOpcode)presence_cmd->opcode;
+
+	switch(opcode){
+		case CS_MICROAPP_COMMAND_PRESENCE_IS_USER_IN_ROOM:{
+			LOGi("TODO IS_USER_IN_ROOM not implemented");
+
+			// always return true for now
+			presence_cmd->result = true;
+
+			break;
+		}
+		case CS_MICROAPP_COMMAND_PRESENCE_GET_USERS:{
+			LOGi("TODO GET_USERS not implemented");
+			break;
+		}
+		default:
+			LOGi("Unknown Presence opcode");
+	}
+}
+
+void handleMeshingCommand(meshing_cmd_t* meshing_cmd){
+
+	CommandMicroappMeshingOpcode opcode = (CommandMicroappMeshingOpcode)meshing_cmd->opcode;
+
+	switch(opcode){
+		case CS_MICROAPP_COMMAND_MESHING_SEND:{
+			LOGi("TODO Meshing SEND not implemented");
+			break;
+		}
+		case CS_MICROAPP_COMMAND_MESHING_RECEIVE:{
+			LOGi("TODO Meshing RECEIVE not implemented");
+			uint8_t msg[] = {1,2,3,4,5,6};
+
+			uint8_t size = sizeof(msg)/ sizeof(msg[0]);
+
+			for(uint8_t i = 0; i<size; i++){
+				meshing_cmd->buf[i] = msg[i];
+			}
+			//meshing_cmd->buf = msg;
+			break;
+		}
+		default:
+			LOGi("Unknown Meshing opcode");
+	}
+
+}
+
+void handlePowerUsageCommand(meshing_cmd_t* meshing_cmd){
+	LOGi("TODO Power Usage not implemented");
+}
+
 void handleSwitchCommand(pin_cmd_t* pin_cmd) {
 	CommandMicroappPinOpcode2 mode = (CommandMicroappPinOpcode2)pin_cmd->opcode2;
 	switch(mode) {
@@ -198,6 +251,10 @@ void handlePinCommand(pin_cmd_t* pin_cmd) {
 			}
 			break;
 		}
+		case CS_MICROAPP_COMMAND_PIN_POWER_USAGE: {
+			handlePowerUsageCommand(pin_cmd_t* pin_cmd);
+			break;
+		}
 		default:
 			LOGw("Unknown pin: %i", pin_cmd->pin);
 	}
@@ -346,6 +403,16 @@ int handleCommand(uint8_t* payload, uint16_t length) {
 			//			CsUtils::printArray(eventData.data.data, eventData.data.len, SERIAL_INFO);
 			event_t event(CS_TYPE::CMD_MICROAPP_ADVERTISE, &eventData, sizeof(eventData));
 			event.dispatch();
+			break;
+		}
+		case CS_MICROAPP_COMMAND_PRESENCE: {
+			presence_cmd_t *presence_cmd = (presence_cmd_t*)payload;
+			handlePresenceCommand(presence_cmd);
+			break;
+		}
+		case CS_MICROAPP_COMMAND_MESHING: {
+			meshing_cmd_t *meshing_cmd = (meshing_cmd_t*)payload;
+			handleMeshingCommand(meshing_cmd);
 			break;
 		}
 		default:

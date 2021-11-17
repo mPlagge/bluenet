@@ -31,6 +31,7 @@ enum CommandMicroappPin {
 	CS_MICROAPP_COMMAND_PIN_LED2          = 0x0a, // LED2
 	CS_MICROAPP_COMMAND_PIN_LED3          = 0x0b, // LED3
 	CS_MICROAPP_COMMAND_PIN_LED4          = 0x0c, // LED4
+	CS_MICROAPP_COMMAND_PIN_POWER_USAGE   = 0x0d, // Power usage Pin
 };
 
 enum ErrorCodesMicroapp {
@@ -44,6 +45,8 @@ enum CommandMicroapp {
 	CS_MICROAPP_COMMAND_PIN               = 0x03,
 	CS_MICROAPP_COMMAND_SERVICE_DATA      = 0x04,
 	CS_MICROAPP_COMMAND_TWI               = 0x05,
+	CS_MICROAPP_COMMAND_PRESENCE          = 0x06,
+	CS_MICROAPP_COMMAND_MESHING           = 0x07,
 };
 
 enum CommandMicroappLogOption {
@@ -90,6 +93,17 @@ enum CommandMicroappPinValue {
 	CS_MICROAPP_COMMAND_VALUE_FALLING     = 0x04,
 };
 
+enum CommandMicroappMeshingOpcode {
+	CS_MICROAPP_COMMAND_MESHING_SEND      = 0x00,
+	CS_MICROAPP_COMMAND_MESHING_RECEIVE   = 0x01,
+};
+
+enum CommandMicroappPresenceOpcode {
+	CS_MICROAPP_COMMAND_PRESENCE_IS_USER_IN_ROOM	= 0x01,
+	CS_MICROAPP_COMMAND_PRESENCE_GET_USERS		= 0x00,
+};
+
+
 /*
  * The structure used for communication between microapp and bluenet.
  */
@@ -125,6 +139,7 @@ typedef struct {
 } sleep_cmd_t;
 
 const uint8_t MAX_TWI_PAYLOAD = MAX_PAYLOAD - 6;
+const uint8_t MAX_MESH_PAYLOAD = MAX_PAYLOAD - 2;
 
 /*
  * Struct for i2c initialization, writes, and reads.
@@ -139,3 +154,16 @@ typedef struct {
 	uint8_t buf[MAX_TWI_PAYLOAD];
 } twi_cmd_t;
 
+typedef struct {
+	uint8_t cmd;
+	uint8_t opcode;
+	uint8_t user_id;
+	uint8_t room_id;
+	bool result;
+} presence_cmd_t;
+
+typedef struct {
+	uint8_t cmd;
+	uint8_t opcode;
+	uint8_t buf[MAX_MESH_PAYLOAD];
+} meshing_cmd_t;
